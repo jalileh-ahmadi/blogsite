@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لیست گروه ها - بلاگ</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .nav-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #2980b9;
+        }
+
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .group-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .group-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .group-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .group-content {
+            padding: 1.5rem;
+        }
+
+        .group-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .group-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-members {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-members:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-join {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-join:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-text {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .groups-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .group-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1.5rem 0;
+            }
+
+            .groups-grid {
+                gap: 1rem;
+            }
+        }
+
+
+        /* ===== مودال اعضا ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #2c3e50;
+        }
+
+        .members-count {
+            font-size: 1.1rem;
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .members-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .member-item:hover {
+            background: #ecf0f1;
+            transform: translateX(-5px);
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        /* دکمه اعضا */
+        .btn-members {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-members:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        /* لودینگ و پیام خطا */
+        .loading, .no-results {
+            text-align: center;
+            padding: 1rem;
+            color: #7f8c8d;
+        }
+
+        /* ریسپانسیو */
+        @media (max-width: 768px) {
+            .modal {
+                max-width: 90vw;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal {
+                padding: 1rem;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <div class="logo">بلاگ من</div>
+            <a href="{% url 'blogs:home' %}" class="nav-link">برگشت به خانه</a>
+        </nav>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <h1 class="page-title">لیست گروه ها</h1>
+
+        {% if groups %}
+            <div class="groups-grid">
+                {% for group in groups %}
+                    <div class="group-card">
+                        <img src="{{ group.image.url }}" alt="{{ group.name }}" class="group-image">
+                        <div class="group-content">
+                            <h2 class="group-name">{{ group.name }}</h2>
+                            <div class="group-actions">
+                                <button onclick="openMembersModal({{ group.id }}, '{{ group.name }}')"
+                                        class="btn btn-members">دیدن اعضای
+                                    گروه
+                                </button>
+                                <div id="memberModal"
+                                     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+                                    <div style="background:white; padding:20px; border-radius:8px; max-width:500px; width:90%; max-height:80%; overflow-y:auto; position:relative;">
+                                        <span id="closeModal"
+                                              style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">&times;</span>
+                                        <h3>اعضای گروه</h3>
+                                        <div id="memberList"
+                                             style="display:flex; flex-direction:column; gap:10px;"></div>
+                                    </div>
+                                </div>
+                                {% if request.user in group.member.all %}
+                                    <button class="btn btn-join" onclick="add_to_group('{{ group.id }}', this)">خروج
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-join" onclick="add_to_group('{{ group.id }}', this)">عضویت در
+                                        گروه
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p class="empty-state-text">هنوز گروهی وجود ندارد</p>
+            </div>
+        {% endif %}
+
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-primary">صفحه قبل</a>
+            {% endif %}
+
+            <span class="page-info">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-primary">صفحه بعد</a>
+            {% endif %}
+        </div>
+
+    </div>
+</main>
+
+<div class="modal-overlay" id="membersModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="membersModalTitle">اعضای گروه</h3>
+            <button type="button" class="modal-close" onclick="closeMembersModal()">✕</button>
+        </div>
+        <div class="members-count" id="membersCount"></div>
+        <div class="members-list" id="membersList">
+            <div class="loading">در حال بارگذاری...</div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    let currentGroupId = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // بررسی می‌کنیم که cookie با نام مورد نظر شروع شود
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    function add_to_group(id, button) {
+        fetch(`add/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'successful_add') {
+                    button.innerText = "خروج";
+                } else if (data.status === 'successful_remove') {
+                    button.innerText = 'عضویت در گروه';
+                }
+            });
+    }
+
+
+    function closeMembersModal() {
+        document.getElementById('membersModal').classList.remove('active');
+        currentGroupId = null;
+    }
+
+
+    function openMembersModal(groupId, groupName) {
+        currentGroupId = groupId;
+        document.getElementById('membersModalTitle').textContent = `اعضای گروه: ${groupName}`;
+        document.getElementById('membersList').innerHTML = '<div class="loading">در حال بارگذاری...</div>';
+        document.getElementById('membersModal').classList.add('active');
+
+        fetch(`members_list/${groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('membersCount').textContent = `تعداد اعضا: ${data.members.length}`;
+
+                if (data.members.length === 0) {
+                    document.getElementById('membersList').innerHTML = '<div class="no-results">هنوز عضوی در این گروه وجود ندارد</div>';
+                    return;
+                }
+
+                const membersList = document.getElementById('membersList');
+                membersList.innerHTML = '';
+
+                data.members.forEach(member => {
+                    const memberLink = document.createElement('a');
+                    memberLink.href = `/posts/${member.id}`;
+                    memberLink.className = 'member-item';
+                    memberLink.innerHTML = `
+                            <img src="${member.image}" alt="${member.username}" class="member-avatar">
+                            <span class="member-name">${member.username}</span>
+                        `;
+                    membersList.appendChild(memberLink);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('membersList').innerHTML = '<div class="no-results">خطایی در بارگذاری اعضا رخ داد</div>';
+            });
+    }
+
+
+
+
+</script>
+
+
+</body>
+</html>

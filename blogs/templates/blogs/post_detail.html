@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }} - بلاگ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .nav-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #2980b9;
+        }
+
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .post-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .post-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.65rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .post-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            word-wrap: break-word;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .author-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .post-date {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .post-body {
+            padding: 2rem;
+        }
+
+        .post-content {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #2c3e50;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .post-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #ecf0f1;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 2rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #2980b9;
+        }
+
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .modal-text {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #c0392b;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .post-title {
+                font-size: 1.8rem;
+            }
+
+            .post-image {
+                height: 250px;
+            }
+
+            .post-header {
+                padding: 1.5rem;
+            }
+
+            .post-body {
+                padding: 1.5rem;
+            }
+
+            .post-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .post-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .post-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1.5rem 0;
+            }
+
+            .post-title {
+                font-size: 1.5rem;
+            }
+
+            .post-header {
+                padding: 1rem;
+            }
+
+            .post-body {
+                padding: 1rem;
+            }
+
+            .post-content {
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">بلاگ من</div>
+                <a href="{% url 'blogs:home' %}" class="nav-link">برگشت به خانه</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+
+            <div class="post-container">
+                <div class="post-header">
+                    {% if post.author == request.user %}
+                    <div class="post-actions">
+                        <a href="{% url 'blogs:edit_post' post.id %}" class="btn btn-edit">✏️ ویرایش پست</a>
+                        <button type="button" class="btn btn-delete" id="deleteBtn">🗑️ حذف پست</button>
+                    </div>
+                    {% endif %}
+
+                    <h1 class="post-title">{{ post.title }}</h1>
+
+                </div>
+
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="post-image">
+
+                <div class="post-body">
+                    <div class="post-content">{{ post.content }}</div>
+                </div>
+
+                <div class="post-footer">
+                    <div class="post-stats">
+                        <div class="stat-item">
+                            <span>📅</span>
+                            <span id="postDateFooter">{{ post.created_at }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>✍️</span>
+                            <span><a href="{% url 'blogs:user_blog' post.author.id %}">{{ post.author.username }}</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="delete-modal" id="deleteModal">
+        <div class="modal-content">
+            <h2 class="modal-title">حذف پست</h2>
+            <p class="modal-text">آیا مطمئن هستید که می‌خواهید این پست را حذف کنید؟ این عمل قابل بازگشت نیست.</p>
+            <div class="modal-actions">
+                <form method="POST" action="{% url 'blogs:delete_post' post.id %}" style="flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-confirm" style="width: 100%;">حذف</button>
+                </form>
+                <button type="button" class="btn btn-cancel" id="cancelBtn">انصراف</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteBtn = document.getElementById('deleteBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const deleteModal = document.getElementById('deleteModal');
+
+            deleteBtn.addEventListener('click', function() {
+                deleteModal.classList.add('active');
+            });
+
+            cancelBtn.addEventListener('click', function() {
+                deleteModal.classList.remove('active');
+            });
+
+            deleteModal.addEventListener('click', function(e) {
+                if (e.target === deleteModal) {
+                    deleteModal.classList.remove('active');
+                }
+            });
+
+            const formatDate = (dateString) => {
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                const date = new Date(dateString);
+                return new Intl.DateTimeFormat('fa-IR', options).format(date);
+            };
+
+            const postDate = document.getElementById('postDate');
+            const postDateFooter = document.getElementById('postDateFooter');
+            if (postDate && postDate.textContent) {
+                postDate.textContent = formatDate(postDate.textContent);
+            }
+            if (postDateFooter && postDateFooter.textContent) {
+                postDateFooter.textContent = formatDate(postDateFooter.textContent);
+            }
+        });
+    </script>
+</body>
+</html>

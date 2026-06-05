@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت گروه‌ها - بلاگ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .nav-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #2980b9;
+        }
+
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .group-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .group-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .group-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .group-content {
+            padding: 1.5rem;
+        }
+
+        .group-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .group-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.65rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 0.85rem;
+            font-size: 0.8rem;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .btn-members {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-members:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #d68910;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-add-user {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-add-user:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-leave {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-leave:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-text {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 0.65rem 1rem;
+            border: 1px solid #ecf0f1;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .pagination .current {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #2c3e50;
+        }
+
+        .members-count {
+            font-size: 1.1rem;
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .members-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .member-item:hover {
+            background: #ecf0f1;
+            transform: translateX(-5px);
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        .search-box {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid #ecf0f1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        .search-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .search-info {
+            flex: 1;
+        }
+
+        .search-username {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .search-action {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-action:hover {
+            background: #27ae60;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 1rem;
+            color: #7f8c8d;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .groups-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+
+            .modal {
+                max-width: 90vw;
+                padding: 1.5rem;
+            }
+
+            .group-actions {
+                flex-direction: column;
+            }
+
+            .btn-small {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1.5rem 0;
+            }
+
+            .groups-grid {
+                gap: 1rem;
+            }
+
+            .modal {
+                padding: 1rem;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 1rem;
+            color: #7f8c8d;
+        }
+
+
+        .messages {
+            position: fixed;
+            top: 80px; /* زیر هدر */
+            right: 20px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            z-index: 9999;
+        }
+
+        .messages li {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            color: white;
+            background-color: #3498db;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .messages li.success {
+            background-color: #2ecc71;
+        }
+
+        .messages li.error {
+            background-color: #e74c3c;
+        }
+
+        .messages li.warning {
+            background-color: #f39c12;
+        }
+
+        .messages li.info {
+            background-color: #3498db;
+        }
+
+        .btn-remove-user {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-remove-user:hover {
+            background: #a93226;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(192, 57, 43, 0.3);
+        }
+
+
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <div class="logo">بلاگ من</div>
+            <a href="/" class="nav-link">برگشت به خانه</a>
+        </nav>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="section">
+            <h2 class="section-title">گروه‌های من</h2>
+
+            {% if usergroups %}
+                <div class="groups-grid">
+                    {% for group in usergroups %}
+                        <div class="group-card">
+                            <img src="{{ group.image.url }}" alt="{{ group.name }}" class="group-image">
+                            <div class="group-content">
+                                <h3 class="group-name">{{ group.name }}</h3>
+                                <div class="group-actions">
+                                    <button type="button" class="btn btn-small btn-members"
+                                            onclick="openMembersModal({{ group.id }}, '{{ group.name }}')">👥 اعضا
+                                    </button>
+                                    <button type="button" class="btn btn-small btn-add-user"
+                                            onclick="openAddUserModal({{ group.id }})">➕ کاربر
+                                    </button>
+                                    <button type="button" class="btn btn-small btn-remove-user"
+                                            onclick="openRemoveUserModal({{ group.id }})">➖ حذف عضو
+                                    </button>
+                                    <a href="{% url 'groups:edit_group' group.id %}" class="btn btn-small btn-edit">✏️
+                                        ویرایش</a>
+                                    <button type="button" class="btn btn-small btn-delete"
+                                            onclick="openDeleteModal({{ group.id }})">🗑️ حذف
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p class="empty-state-text">هنوز گروهی ایجاد نکرده‌اید</p>
+                </div>
+            {% endif %}
+        </div>
+        {% if usergroups.paginator.num_pages > 1 %}
+            <div class="pagination">
+                {% if usergroups.has_previous %}
+                    <a href="?page1=1&page={{ page_obj.number }}">اول</a>
+                    <a href="?page1={{ usergroups.previous_page_number }}&page={{ page_obj.number }}">قبلی</a>
+                {% endif %}
+
+                {% for num in usergroups.paginator.page_range %}
+                    {% if usergroups.number == num %}
+                        <span class="current">{{ num }}</span>
+                    {% elif num > usergroups.number|add:'-3' and num < usergroups.number|add:'3' %}
+                        <a href="?page1={{ num }}&page={{ page_obj.number }}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if usergroups.has_next %}
+                    <a href="?page1={{ usergroups.next_page_number }}&page={{ page_obj.number }}">بعدی</a>
+                    <a href="?page1={{ usergroups.paginator.num_pages }}&page={{ page_obj.number }}">آخر</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="section">
+            <h2 class="section-title">گروه‌های عضویتی</h2>
+
+            {% if page_obj %}
+                <div class="groups-grid">
+                    {% for group in page_obj %}
+                        <div class="group-card">
+                            <img src="{{ group.image.url }}" alt="{{ group.name }}" class="group-image">
+                            <div class="group-content">
+                                <h3 class="group-name">{{ group.name }}</h3>
+                                <div class="group-actions">
+                                    <button type="button" class="btn btn-small btn-members"
+                                            onclick="openMembersModal({{ group.id }}, '{{ group.name }}')">👥 اعضا
+                                    </button>
+
+                                    {% if request.user in group.member.all %}
+                                        <button class="btn btn-small btn-leave" style="width: 100%;"
+                                                onclick="add_to_group('{{ group.id }}', this)">🚪خروج
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-small btn-leave" style="width: 100%;"
+                                                onclick="add_to_group('{{ group.id }}', this)">
+                                            عضویت در
+                                            گروه
+                                        </button>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if is_paginated %}
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1&page1={{ usergroups.number }}">اول</a>
+                            <a href="?page={{ page_obj.previous_page_number }}&page1={{ usergroups.number }}">قبلی</a>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="current">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}&page1={{ usergroups.number }}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}&page1={{ usergroups.number }}">بعدی</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}&page1={{ usergroups.number }}">آخر</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <p class="empty-state-text">هنوز در هیچ گروهی عضو نشده‌اید</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<div class="modal-overlay" id="removeUserModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">حذف کاربر از گروه</h3>
+            <button type="button" class="modal-close" onclick="closeRemoveUserModal()">✕</button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="removeSearchInput" placeholder="جستجو بر اساس نام کاربری..." autocomplete="off">
+        </div>
+        <div class="search-results" id="removeSearchResults"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="membersModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="membersModalTitle">اعضای گروه</h3>
+            <button type="button" class="modal-close" onclick="closeMembersModal()">✕</button>
+        </div>
+        <div class="members-count" id="membersCount"></div>
+        <div class="members-list" id="membersList">
+            <div class="loading">در حال بارگذاری...</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="addUserModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">افزودن کاربر به گروه</h3>
+            <button type="button" class="modal-close" onclick="closeAddUserModal()">✕</button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="جستجو بر اساس نام کاربری..." autocomplete="off">
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">حذف گروه</h3>
+            <button type="button" class="modal-close" onclick="closeDeleteModal()">✕</button>
+        </div>
+        <p style="color: #7f8c8d; margin-bottom: 1.5rem;">آیا مطمئن هستید که می‌خواهید این گروه را حذف کنید؟ این عمل
+            قابل بازگشت نیست.</p>
+        <div class="modal-actions">
+            <form method="POST" id="deleteForm" style="flex: 1;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-delete" style="width: 100%; padding: 0.65rem;">حذف</button>
+            </form>
+            <button type="button" class="btn" style="flex: 1; background: #95a5a6; color: white; padding: 0.65rem;"
+                    onclick="closeDeleteModal()">انصراف
+            </button>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    <ul class="messages" id="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+
+<script>
+
+    setTimeout(function () {
+        const messages = document.getElementById('messages');
+        if (messages) {
+            messages.style.transition = 'opacity 0.5s ease';
+            messages.style.opacity = '0';
+            setTimeout(() => messages.remove(), 500); // بعد از fade out حذف شود
+        }
+    }, 2000);
+
+
+    let currentGroupId = null;
+
+    function deleteGroups(groupId) {
+        fetch(`delete_group/${groupId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'successful_delete') {
+                    alert("گروه حذف شد");
+                } else if (data.status === 'you_are_not_admin') {
+                    alert("فقط ادمین میتواند گروه را حذف کند")
+                } else if (data.error === 'No Group matches the given query.') {
+                    alert('گروه وجود ندارد')
+                } else {
+                    alert(data.error)
+                }
+            });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // بررسی می‌کنیم که cookie با نام مورد نظر شروع شود
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function add_to_group(id, button) {
+        fetch(`add/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'successful_add') {
+                    button.innerText = "خروج";
+                } else if (data.status === 'successful_remove') {
+                    button.innerText = 'عضویت در گروه';
+                }
+            });
+    }
+
+    function openMembersModal(groupId, groupName) {
+        currentGroupId = groupId;
+        document.getElementById('membersModalTitle').textContent = `اعضای گروه: ${groupName}`;
+        document.getElementById('membersList').innerHTML = '<div class="loading">در حال بارگذاری...</div>';
+        document.getElementById('membersModal').classList.add('active');
+
+        fetch(`members_list/${groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('membersCount').textContent = `تعداد اعضا: ${data.members.length}`;
+
+                if (data.members.length === 0) {
+                    document.getElementById('membersList').innerHTML = '<div class="no-results">هنوز عضوی در این گروه وجود ندارد</div>';
+                    return;
+                }
+
+                const membersList = document.getElementById('membersList');
+                membersList.innerHTML = '';
+
+                data.members.forEach(member => {
+                    const memberLink = document.createElement('a');
+                    memberLink.href = `/posts/${member.id}`;
+                    memberLink.className = 'member-item';
+                    memberLink.innerHTML = `
+                            <img src="${member.image}" alt="${member.username}" class="member-avatar">
+                            <span class="member-name">${member.username}</span>
+                            ${member.is_admin ? '<span class="member-role">ادمین</span>' : ''}
+                        `;
+                    membersList.appendChild(memberLink);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('membersList').innerHTML = '<div class="no-results">خطایی در بارگذاری اعضا رخ داد</div>';
+            });
+    }
+
+    function closeMembersModal() {
+        document.getElementById('membersModal').classList.remove('active');
+        currentGroupId = null;
+    }
+
+    function openAddUserModal(groupId) {
+        currentGroupId = groupId;
+        document.getElementById('addUserModal').classList.add('active');
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchResults').innerHTML = '';
+        document.getElementById('searchInput').focus();
+    }
+
+    function closeAddUserModal() {
+        document.getElementById('addUserModal').classList.remove('active');
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchResults').innerHTML = '';
+        currentGroupId = null;
+    }
+
+    function openDeleteModal(groupId) {
+        currentGroupId = groupId;
+        document.getElementById('deleteForm').action = `/delete_group/${groupId}`;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+        currentGroupId = null;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value.trim();
+        if (query.length < 1) {
+            document.getElementById('searchResults').innerHTML = '';
+            return;
+        }
+
+        fetch(`/search/user/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const resultsContainer = document.getElementById('searchResults');
+                resultsContainer.innerHTML = '';
+
+                if (data.users.length === 0) {
+                    resultsContainer.innerHTML = '<div class="no-results">کاربری یافت نشد</div>';
+                    return;
+                }
+
+                data.users.forEach(user => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.innerHTML = `
+                            <img src="${user.image}" alt="${user.username}" class="search-avatar">
+                            <div class="search-info">
+                                <div class="search-username">${user.username}</div>
+                            </div>
+                            <button type="button" class="search-action" onclick="addUserToGroup(${currentGroupId}, ${user.id})">افزودن</button>
+                        `;
+                    resultsContainer.appendChild(resultItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('searchResults').innerHTML = '<div class="no-results">خطایی در جستجو رخ داد</div>';
+            });
+    });
+
+    function addUserToGroup(groupId, userId) {
+        fetch(`/add_member/${groupId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({user_id: userId})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('کاربر با موفقیت به گروه اضافه شد');
+                    closeAddUserModal();
+                    location.reload();
+                } else {
+                    alert(data.message || 'خطایی رخ داد');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('خطایی در اضافه کردن کاربر رخ داد');
+            });
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.id === 'membersModal') closeMembersModal();
+        if (e.target.id === 'addUserModal') closeAddUserModal();
+        if (e.target.id === 'deleteModal') closeDeleteModal();
+        if (e.target.id === 'removeUserModal') closeRemoveUserModal();
+    });
+
+
+
+
+    function openRemoveUserModal(groupId) {
+            currentGroupId = groupId;
+            document.getElementById('removeUserModal').classList.add('active');
+            document.getElementById('removeSearchInput').value = '';
+            document.getElementById('removeSearchResults').innerHTML = '';
+            document.getElementById('removeSearchInput').focus();
+        }
+
+        function closeRemoveUserModal() {
+            document.getElementById('removeUserModal').classList.remove('active');
+            document.getElementById('removeSearchInput').value = '';
+            document.getElementById('removeSearchResults').innerHTML = '';
+            currentGroupId = null;
+        }
+
+        document.getElementById('removeSearchInput').addEventListener('input', function() {
+            const query = this.value.trim();
+            if (query.length < 1) {
+                document.getElementById('removeSearchResults').innerHTML = '';
+                return;
+            }
+
+            fetch(`/search/member/${currentGroupId}/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById('removeSearchResults');
+                    resultsContainer.innerHTML = '';
+
+                    if (data.members.length === 0) {
+                        resultsContainer.innerHTML = '<div class="no-results">کاربری یافت نشد</div>';
+                        return;
+                    }
+
+                    data.members.forEach(member => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'search-result-item';
+                        resultItem.innerHTML = `
+                            <img src="${member.image}" alt="${member.username}" class="search-avatar">
+                            <div class="search-info">
+                                <div class="search-username">${member.username}</div>
+                            </div>
+                            <button type="button" class="search-action" style="background: #e74c3c;" onclick="removeUserFromGroup(${currentGroupId}, ${member.id})">حذف</button>
+                        `;
+                        resultsContainer.appendChild(resultItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('removeSearchResults').innerHTML = '<div class="no-results">خطایی در جستجو رخ داد</div>';
+                });
+        });
+
+        function removeUserFromGroup(groupId, userId) {
+            if (confirm('آیا مطمئن هستید که می‌خواهید این کاربر را حذف کنید؟')) {
+                fetch(`/remove_member/${groupId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('کاربر با موفقیت حذف شد');
+                        closeRemoveUserModal();
+                        location.reload();
+                    } else {
+                        alert(data.message || 'خطایی رخ داد');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('خطایی در حذف کاربر رخ داد');
+                });
+            }
+        }
+
+
+
+
+
+</script>
+</body>
+</html>

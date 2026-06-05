@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="form-container">
+                <h1 class="page-title">ایجاد پست جدید</h1>
+
+                {% if form.non_field_errors %}
+                <div class="form-errors">
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" id="blogForm">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        {% if field.name != 'csrf_token' %}
+                        <div class="form-group">
+                            {% if field.field.widget.input_type == 'hidden' %}
+                                {{ field }}
+                            {% else %}
+                                <label for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="required">*</span>{% endif %}
+                                </label>
+
+                                {% if field.field.widget.input_type == 'textarea' %}
+                                    {{ field }}
+                                    <div class="char-count">
+                                        <span id="charCount-{{ field.name }}">0</span> / 5000 حرف
+                                    </div>
+                                {% elif field.field.widget.input_type == 'file' %}
+                                    <div class="file-input-wrapper">
+                                        <label for="{{ field.id_for_label }}" class="file-input-label">
+                                            <span>📁 برای انتخاب فایل کلیک کنید </span>
+                                            {{ field }}
+                                        </label>
+                                        <div class="file-name" id="fileName-{{ field.name }}"></div>
+                                    </div>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+
+                                {% if field.help_text %}
+                                <div class="help-text">{{ field.help_text|safe }}</div>
+                                {% endif %}
+
+                                {% if field.errors %}
+                                <div class="form-errors">
+                                    <ul>
+                                        {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-submit">انتشار پست</button>
+                        <a href="{% url 'blogs:home' %}" class="btn btn-cancel">لغو</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('blogForm');
+
+            const textareas = form.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                const charCountElement = document.getElementById(`charCount-${textarea.name}`);
+                if (charCountElement) {
+                    textarea.addEventListener('input', function() {
+                        charCountElement.textContent = this.value.length;
+                    });
+                    charCountElement.textContent = textarea.value.length;
+                }
+            });
+
+            const fileInputs = form.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(fileInput => {
+                const fileNameElement = document.getElementById(`fileName-${fileInput.name}`);
+                if (fileNameElement) {
+                    fileInput.addEventListener('change', function() {
+                        if (this.files.length > 0) {
+                            fileNameElement.textContent = `انتخاب شده: ${this.files[0].name}`;
+                        } else {
+                            fileNameElement.textContent = '';
+                        }
+                    });
+                }
+
+                const label = fileInput.closest('.file-input-wrapper').querySelector('.file-input-label');
+                if (label) {
+                    label.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        this.style.background = '#ecf0f1';
+                        this.style.borderColor = '#2980b9';
+                    });
+
+                    label.addEventListener('dragleave', function() {
+                        this.style.background = '#f8f9fa';
+                        this.style.borderColor = '#3498db';
+                    });
+
+                    label.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.style.background = '#f8f9fa';
+                        this.style.borderColor = '#3498db';
+
+                        if (e.dataTransfer.files.length > 0) {
+                            fileInput.files = e.dataTransfer.files;
+                            const event = new Event('change', { bubbles: true });
+                            fileInput.dispatchEvent(event);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+<button onclick="loadMembers('{{ group.id }}')" class="btn btn-members">دیدن اعضای گروه</button>
+
+    group = Group.objects.filter(id=pk)
+    members = group.group_memberships.all()
+
+member_list = []
+    for member in members:
+        member_list.append(
+            {'name': member.username,
+             'image': member.profile_image.url
+             }
+        )
+
+{{ post.title }}
+{{ post.content }}
+{{ post.image }}
+{{ post.author.profile_image }}
+{{ post.created_at }}
+{{ user.profile_image }}
+{{ user.username }}
+
+<button type="submit" class="btn btn-small btn-leave" style="width: 100%;">🚪
+                                            خروج
+                                        </button>
